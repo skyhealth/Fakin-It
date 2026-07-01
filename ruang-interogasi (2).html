@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Ruang Interogasi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#151210;
+    --bulb:#f2b705;
+    --paper:#ece3d0;
+    --paper-dim:#d8cdb5;
+    --red:#a53a2f;
+    --line:#3a332c;
+    --text-dim:#a89f8f;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(242,183,5,0.10), transparent 70%),
+      var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:0;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    padding:28px 20px 40px;
+    position:relative;
+  }
+  .bulb{
+    width:1px; height:1px; margin:0 auto;
+    position:relative;
+  }
+  .bulb::before{
+    content:'';
+    position:absolute;
+    top:-18px; left:50%; transform:translateX(-50%);
+    width:220px; height:220px;
+    background:radial-gradient(circle, rgba(242,183,5,0.16), transparent 65%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--bulb);
+    text-align:center;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Special Elite', cursive;
+    font-size:30px;
+    text-align:center;
+    letter-spacing:0.03em;
+    margin:0 0 4px;
+    color:var(--paper);
+    text-shadow:0 0 30px rgba(242,183,5,0.15);
+  }
+  .sub{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:13px;
+    margin-bottom:30px;
+    line-height:1.5;
+  }
+  .card{
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:2px;
+    padding:22px 20px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.05) inset;
+    position:relative;
+    margin-bottom:16px;
+  }
+  .card::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:6px;
+    background:repeating-linear-gradient(90deg, var(--red) 0 10px, transparent 10px 20px);
+    opacity:0.5;
+  }
+  label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:#6b6255;
+    margin-bottom:6px;
+  }
+  input{
+    width:100%;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:20px;
+    letter-spacing:0.08em;
+    padding:12px 10px;
+    border:none;
+    border-bottom:2px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    margin-bottom:18px;
+    outline:none;
+  }
+  input::placeholder{color:#a89f8f; letter-spacing:normal; font-size:15px;}
+  input.code{text-transform:uppercase; text-align:center; letter-spacing:0.3em;}
+  button{
+    width:100%;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    padding:14px;
+    border:none;
+    border-radius:2px;
+    cursor:pointer;
+    transition:transform 0.08s ease, opacity 0.15s ease;
+  }
+  button:active{transform:scale(0.98);}
+  button.primary{background:var(--red); color:#f5ede0;}
+  button.ghost{background:transparent; color:var(--paper); border:1px solid var(--line); margin-top:10px;}
+  button:disabled{opacity:0.4; cursor:not-allowed;}
+  .divider{
+    text-align:center; color:var(--text-dim); font-size:11px;
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.1em;
+    margin:22px 0;
+    display:flex; align-items:center; gap:10px;
+  }
+  .divider::before, .divider::after{content:''; flex:1; height:1px; background:var(--line);}
+  .code-display{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:42px;
+    font-weight:600;
+    letter-spacing:0.18em;
+    text-align:center;
+    color:var(--bulb);
+    margin:6px 0 2px;
+  }
+  .code-hint{text-align:center; color:var(--text-dim); font-size:12px; margin-bottom:24px;}
+  .players{list-style:none; padding:0; margin:0 0 20px;}
+  .players li{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 4px;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+  }
+  .players li:last-child{border-bottom:none;}
+  .dot{width:6px; height:6px; border-radius:50%; background:var(--bulb); flex-shrink:0;}
+  .count-badge{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .role-card{
+    text-align:center;
+    padding:40px 20px;
+    min-height:220px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+  }
+  .stamp{
+    font-family:'Special Elite', cursive;
+    font-size:22px;
+    color:var(--red);
+    border:3px solid var(--red);
+    padding:8px 18px;
+    border-radius:4px;
+    transform:rotate(-6deg);
+    display:inline-block;
+    letter-spacing:0.06em;
+    margin-bottom:18px;
+    opacity:0.9;
+  }
+  .prompt-text{
+    font-family:'Special Elite', cursive;
+    font-size:19px;
+    line-height:1.5;
+    color:var(--ink);
+  }
+  .faker-text{
+    font-family:'Special Elite', cursive;
+    font-size:17px;
+    line-height:1.6;
+    color:var(--ink);
+  }
+  .tap-reveal{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .tap-reveal .tap-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:#6b6255;
+    margin-top:14px;
+  }
+  .waiting{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--text-dim);
+    font-size:14px;
+  }
+  .waiting .pulse{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--bulb);
+    margin:0 auto 16px;
+    animation:pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:0.3; transform:scale(0.9);}
+    50%{opacity:1; transform:scale(1.15);}
+  }
+  .error{
+    color:#e08a7d;
+    font-size:13px;
+    text-align:center;
+    margin:-8px 0 16px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .footer-note{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:11.5px;
+    margin-top:18px;
+    line-height:1.5;
+  }
+  a.reset-link{color:var(--bulb); text-decoration:none; border-bottom:1px dotted var(--bulb);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bulb"></div>
+  <div class="eyebrow">Kasus Nomor ??? &mdash; Rahasia</div>
+  <h1>Ruang Interogasi</h1>
+  <p class="sub">Semua orang tahu petunjuknya. Satu orang berbohong.<br>Cari tahu siapa.</p>
+  <div id="root"></div>
+</div>
+
+<script>
+const PROMPTS = [
+  "Angkat tanganmu kalau kamu pernah pura-pura sakit biar nggak masuk kerja/sekolah.",
+  "Angkat tanganmu kalau kamu pernah nge-stalk mantan di media sosial minggu ini.",
+  "Angkat tanganmu kalau kamu pernah berbohong soal harga barang yang kamu beli.",
+  "Angkat tanganmu kalau kamu pernah ketiduran saat lagi video call penting.",
+  "Angkat tanganmu kalau kamu pernah nyontek waktu ujian.",
+  "Angkat tanganmu kalau kamu pernah diam-diam benci lagu yang lagi hits.",
+  "Angkat tanganmu kalau kamu pernah salah kirim chat ke orang yang dibicarain.",
+  "Angkat tanganmu kalau kamu pernah pura-pura paham topik obrolan padahal nggak ngerti sama sekali.",
+  "Angkat tanganmu kalau kamu pernah makan makanan yang jatuh ke lantai.",
+  "Angkat tanganmu kalau kamu pernah bohong soal alasan telat.",
+  "Angkat tanganmu kalau kamu pernah nangis nonton iklan.",
+  "Angkat tanganmu kalau kamu pernah ghosting seseorang tanpa alasan jelas.",
+  "Angkat tanganmu kalau kamu pernah kepo isi HP pasangan atau teman.",
+  "Angkat tanganmu kalau kamu pernah bilang 'otw' padahal belum siap-siap sama sekali.",
+  "Angkat tanganmu kalau kamu pernah nyanyi keras-keras sendirian di kamar mandi.",
+  "Angkat tanganmu kalau kamu pernah nyari nama sendiri di Google.",
+  "Angkat tanganmu kalau kamu pernah pura-pura sibuk biar nggak diajak ngobrol.",
+  "Angkat tanganmu kalau kamu pernah salah panggil nama pacar/gebetan.",
+  "Angkat tanganmu kalau kamu pernah diam-diam nangis nonton film kartun.",
+  "Angkat tanganmu kalau kamu pernah bilang 'aku juga lagi di jalan' padahal masih rebahan."
+];
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+const myId = uid();
+let state = { screen: 'landing', roomCode: '', name: '', isHost: false, error: '', revealed: false };
+let pollTimer = null;
+
+const JSONBLOB = 'https://jsonblob.com/api/jsonBlob';
+
+async function getRoom(code){
+  try{
+    const res = await fetch(JSONBLOB + '/' + code, { headers: {'Accept':'application/json'} });
+    if(!res.ok) return null;
+    return await res.json();
+  }catch(e){ return null; }
+}
+async function setRoom(code, data){
+  try{
+    const res = await fetch(JSONBLOB + '/' + code, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+async function createRoomBlob(data){
+  try{
+    const res = await fetch(JSONBLOB, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+    if(!res.ok) return null;
+    const loc = res.headers.get('Location');
+    if(!loc) return null;
+    return loc.split('/').pop();
+  }catch(e){ return null; }
+}
+
+async function createRoom(){
+  const name = document.getElementById('hostName').value.trim();
+  if(!name){ state.error = 'Isi nama kamu dulu.'; render(); return; }
+  const room = {
+    hostId: myId,
+    players: [{ id: myId, name }],
+    status: 'lobby',
+    round: null,
+    prompts: PROMPTS.slice(),
+    createdAt: Date.now()
+  };
+  const code = await createRoomBlob(room);
+  if(!code){ state.error = 'Gagal bikin ruangan, coba lagi (cek koneksi internet).'; render(); return; }
+  state = { screen:'lobby', roomCode: code, name, isHost:true, error:'', revealed:false };
+  startPolling();
+  render();
+}
+
+async function joinRoom(){
+  const name = document.getElementById('joinName').value.trim();
+  const code = document.getElementById('joinCode').value.trim();
+  if(!name || !code){ state.error = 'Isi nama dan kode ruangan.'; render(); return; }
+  const room = await getRoom(code);
+  if(!room){ state.error = 'Kode ruangan nggak ketemu.'; render(); return; }
+  if(!room.players.find(p=>p.id===myId)){
+    room.players.push({ id: myId, name });
+    await setRoom(code, room);
+  }
+  state = { screen:'lobby', roomCode: code, name, isHost:false, error:'', revealed:false };
+  startPolling();
+  render();
+}
+
+async function startRound(){
+  const room = await getRoom(state.roomCode);
+  if(!room || room.players.length < 3){ state.error = 'Butuh minimal 3 pemain.'; render(); return; }
+  const bank = (room.prompts && room.prompts.length) ? room.prompts : PROMPTS;
+  const prompt = bank[Math.floor(Math.random()*bank.length)];
+  const faker = room.players[Math.floor(Math.random()*room.players.length)];
+  room.status = 'active';
+  room.round = {
+    prompt,
+    fakerId: faker.id,
+    roundNum: (room.round?.roundNum || 0) + 1
+  };
+  await setRoom(state.roomCode, room);
+  state.revealed = false;
+  render();
+}
+
+async function nextRound(){
+  state.revealed = false;
+  await startRound();
+}
+
+async function resetLobby(){
+  const room = await getRoom(state.roomCode);
+  if(!room) return;
+  room.status = 'lobby';
+  room.round = null;
+  await setRoom(state.roomCode, room);
+  state.revealed = false;
+  render();
+}
+
+function startPolling(){
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async ()=>{
+    if(state.screen !== 'lobby') return;
+    const room = await getRoom(state.roomCode);
+    if(room) render(room);
+  }, 1800);
+}
+
+async function addPrompt(){
+  const input = document.getElementById('newPrompt');
+  const text = input.value.trim();
+  if(!text) return;
+  const room = await getRoom(state.roomCode);
+  if(!room) return;
+  room.prompts = room.prompts || PROMPTS.slice();
+  room.prompts.push(text);
+  await setRoom(state.roomCode, room);
+  render(room);
+}
+
+async function removePrompt(idx){
+  const room = await getRoom(state.roomCode);
+  if(!room) return;
+  room.prompts.splice(idx, 1);
+  await setRoom(state.roomCode, room);
+  render(room);
+}
+
+function togglePromptEditor(){
+  state.editingPrompts = !state.editingPrompts;
+  render();
+}
+
+function leaveRoom(){
+  if(pollTimer) clearInterval(pollTimer);
+  state = { screen:'landing', roomCode:'', name:'', isHost:false, error:'', revealed:false };
+  render();
+}
+
+function el(html){ const d=document.createElement('div'); d.innerHTML=html; return d.firstElementChild; }
+
+async function render(cachedRoom){
+  const root = document.getElementById('root');
+  root.innerHTML = '';
+
+  if(state.screen === 'landing'){
+    root.appendChild(el(`
+      <div>
+        <div class="card">
+          <label>Nama kamu</label>
+          <input id="hostName" placeholder="cth. Dinda" maxlength="20">
+          <button class="primary" id="btnCreate">Buat Ruangan</button>
+        </div>
+        <div class="divider">atau</div>
+        <div class="card">
+          <label>Nama kamu</label>
+          <input id="joinName" placeholder="cth. Bima" maxlength="20">
+          <label>Kode / link ruangan</label>
+          <input id="joinCode" placeholder="Tempel kode dari host" maxlength="80">
+          <button class="primary" id="btnJoin">Gabung Ruangan</button>
+        </div>
+        ${state.error ? `<div class="error">${state.error}</div>` : ''}
+        <p class="footer-note">Satu orang bikin ruangan, bagikan kodenya lewat WhatsApp sekali aja. Semua orang buka link ini di HP masing-masing dan masukin kode. Peran dirahasiakan otomatis di layar masing-masing.</p>
+      </div>
+    `));
+    document.getElementById('btnCreate').onclick = createRoom;
+    document.getElementById('btnJoin').onclick = joinRoom;
+    return;
+  }
+
+  const room = cachedRoom || await getRoom(state.roomCode);
+  if(!room){ state.screen='landing'; state.error='Ruangan sudah tidak ada.'; render(); return; }
+
+  if(room.status === 'lobby'){
+    root.appendChild(el(`
+      <div>
+        <div class="card" style="text-align:center;">
+          <label style="text-align:center;">Kode ruangan</label>
+          <div class="code-display" style="font-size:22px; word-break:break-all; letter-spacing:0.02em;">${state.roomCode}</div>
+          <div class="code-hint">Atau bagikan link undangan langsung</div>
+          <button class="ghost" id="btnCopyLink" style="margin-top:10px;">Salin Link Undangan</button>
+        </div>
+        <div class="card">
+          <label>Pemain (${room.players.length})</label>
+          <ul class="players">
+            ${room.players.map(p=>`<li><span class="dot"></span>${p.name}${p.id===room.hostId ? ' &middot; host' : ''}</li>`).join('')}
+          </ul>
+          ${state.isHost
+            ? `<button class="primary" id="btnStart" ${room.players.length<3?'disabled':''}>Mulai Ronde</button>`
+            : `<div class="waiting" style="padding:12px 0 0;"><div class="pulse"></div>Menunggu host memulai...</div>`}
+        </div>
+        ${state.isHost ? `
+        <div class="card">
+          <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" id="btnToggleEditor">
+            Kelola Petunjuk (${(room.prompts||PROMPTS).length})
+            <span style="font-size:16px;">${state.editingPrompts ? '&#9650;' : '&#9660;'}</span>
+          </label>
+          ${state.editingPrompts ? `
+            <ul class="players" style="max-height:220px; overflow-y:auto;">
+              ${(room.prompts||PROMPTS).map((p,i)=>`
+                <li style="align-items:flex-start;">
+                  <span style="flex:1; font-size:13.5px; line-height:1.4;">${p}</span>
+                  <button data-idx="${i}" class="btnRemovePrompt" style="width:auto; padding:4px 10px; font-size:12px; background:transparent; color:var(--red); border:1px solid var(--red);">Hapus</button>
+                </li>
+              `).join('')}
+            </ul>
+            <label style="margin-top:10px;">Tambah petunjuk baru</label>
+            <input id="newPrompt" placeholder="Angkat tanganmu kalau...">
+            <button class="ghost" id="btnAddPrompt" style="margin-top:0;">+ Tambah</button>
+          ` : ''}
+        </div>` : ''}
+        ${state.error ? `<div class="error">${state.error}</div>` : ''}
+        <button class="ghost" id="btnLeave">Keluar Ruangan</button>
+      </div>
+    `));
+    if(state.isHost){
+      document.getElementById('btnStart').onclick = startRound;
+      document.getElementById('btnToggleEditor').onclick = togglePromptEditor;
+      const copyBtn = document.getElementById('btnCopyLink');
+      if(copyBtn) copyBtn.onclick = ()=>{
+        const link = window.location.origin + window.location.pathname + '?code=' + state.roomCode;
+        navigator.clipboard?.writeText(link).then(()=>{
+          copyBtn.textContent = 'Link disalin!';
+          setTimeout(()=>{ copyBtn.textContent = 'Salin Link Undangan'; }, 1800);
+        });
+      };
+      if(state.editingPrompts){
+        document.getElementById('btnAddPrompt').onclick = addPrompt;
+        document.querySelectorAll('.btnRemovePrompt').forEach(b=>{
+          b.onclick = ()=> removePrompt(parseInt(b.dataset.idx));
+        });
+      }
+    }
+    document.getElementById('btnLeave').onclick = leaveRoom;
+    return;
+  }
+
+  if(room.status === 'active'){
+    const isFaker = room.round.fakerId === myId;
+    if(!state.revealed){
+      root.appendChild(el(`
+        <div class="card tap-reveal" id="tapCard">
+          <div style="font-size:32px;">&#128274;</div>
+          <div class="tap-label">Ronde ${room.round.roundNum} &middot; Ketuk untuk lihat perananmu</div>
+        </div>
+      `));
+      document.getElementById('tapCard').onclick = ()=>{ state.revealed = true; render(room); };
+    } else if(isFaker){
+      root.appendChild(el(`
+        <div class="card role-card">
+          <div class="stamp">Kamu Berbohong</div>
+          <div class="faker-text">Semua orang lain dapat petunjuk yang sama &mdash; kamu enggak. Dengarkan jawaban mereka, ikut-ikutan, dan coba lolos tanpa ketahuan.</div>
+        </div>
+      `));
+    } else {
+      root.appendChild(el(`
+        <div class="card role-card">
+          <div class="stamp" style="border-color:#4a7a5a; color:#4a7a5a;">Petunjukmu</div>
+          <div class="prompt-text">${room.round.prompt}</div>
+        </div>
+      `));
+    }
+    if(state.isHost){
+      root.appendChild(el(`
+        <div>
+          <button class="primary" id="btnNext">Ronde Berikutnya</button>
+          <button class="ghost" id="btnReset">Kembali ke Lobi</button>
+        </div>
+      `));
+      document.getElementById('btnNext').onclick = nextRound;
+      document.getElementById('btnReset').onclick = resetLobby;
+    } else {
+      root.appendChild(el(`<div class="footer-note">Setelah semua orang buka petunjuknya, mulai berdebat dan cari siapa yang bohong.</div>`));
+    }
+  }
+}
+
+render();
+
+const urlCode = new URLSearchParams(window.location.search).get('code');
+if(urlCode){
+  setTimeout(()=>{
+    const el2 = document.getElementById('joinCode');
+    if(el2) el2.value = urlCode;
+  }, 0);
+}
+</script>
+</body>
+</html>
